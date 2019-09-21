@@ -1,0 +1,21 @@
+stages:
+  - lint
+  - test
+
+ESLint:
+  image: node:10.16.3-alpine
+  stage: lint
+  script:
+    - npm install
+    - npm run code:lint
+
+Test Execution:
+  image: node:10.16.3-alpine
+  stage: test
+  script:
+#    Run a standalone-chrome image. It has selenium and chrome already running in it
+    - docker run --name selenium-server -d -p 4444:4444 selenium/standalone-chrome:3.141.59-vanadium
+    - npm install
+#    Run a test suite which will now point to the selenium server and chrome running in other container
+    - ARG_HEADLESS='--headless' npm run test
+  when: manual
